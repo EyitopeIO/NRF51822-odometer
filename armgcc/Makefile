@@ -1,12 +1,12 @@
-PROJECT_NAME     := ble_app_beacon_pca20006_s130
-TARGETS          := nrf51422_xxac
+PROJECT_NAME     := odometer
+TARGETS          := nrf51822_xxaa
 OUTPUT_DIRECTORY := _build
 
-SDK_ROOT := ../../../../../..
-PROJ_DIR := ../../..
+SDK_ROOT := $(shell realpath ~/Projects/nRF5_SDK_12.3.0_d7731ad)
+PROJ_DIR := $(shell realpath ../)
 
-$(OUTPUT_DIRECTORY)/nrf51422_xxac.out: \
-  LINKER_SCRIPT  := ble_app_beacon_gcc_nrf51.ld
+$(OUTPUT_DIRECTORY)/nrf51822_xxaa.out: \
+  LINKER_SCRIPT  := odometer_nrf51.ld
 
 # Source files common to all targets
 SRC_FILES += \
@@ -20,14 +20,11 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/hardfault/hardfault_implementation.c \
   $(SDK_ROOT)/components/libraries/util/nrf_assert.c \
   $(SDK_ROOT)/components/libraries/util/sdk_errors.c \
-  $(SDK_ROOT)/components/boards/boards.c \
   $(SDK_ROOT)/components/drivers_nrf/clock/nrf_drv_clock.c \
   $(SDK_ROOT)/components/drivers_nrf/common/nrf_drv_common.c \
   $(SDK_ROOT)/components/drivers_nrf/gpiote/nrf_drv_gpiote.c \
   $(SDK_ROOT)/components/drivers_nrf/uart/nrf_drv_uart.c \
-  $(SDK_ROOT)/components/libraries/bsp/bsp.c \
-  $(SDK_ROOT)/components/libraries/bsp/bsp_nfc.c \
-  $(PROJ_DIR)/main.c \
+  $(PROJ_DIR)/sources/main.c \
   $(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
@@ -36,7 +33,12 @@ SRC_FILES += \
   $(SDK_ROOT)/components/ble/common/ble_srv_common.c \
   $(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf51.S \
   $(SDK_ROOT)/components/toolchain/system_nrf51.c \
-  $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
+  $(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c
+# Likely to be removed
+SRC_FILES += \
+ $(SDK_ROOT)/components/boards/boards.c \
+ $(SDK_ROOT)/components/libraries/bsp/bsp.c \
+ $(SDK_ROOT)/components/libraries/bsp/bsp_nfc.c 
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -173,7 +175,7 @@ ASMFLAGS += -DNRF51
 ASMFLAGS += -DNRF51822
 ASMFLAGS += -DS130
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
-ASMFLAGS += -DBOARD_PCA20006
+# ASMFLAGS += -DBOARD_PCA20006
 ASMFLAGS += -DNRF_SD_BLE_API_VERSION=2
 
 # Linker flags
@@ -188,12 +190,12 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 .PHONY: $(TARGETS) default all clean help flash flash_softdevice
 
 # Default target - first one defined
-default: nrf51422_xxac
+default: nrf51822_xxaa
 
 # Print all targets that can be built
 help:
 	@echo following targets are available:
-	@echo 	nrf51422_xxac
+	@echo 	nrf51822_xxac
 
 TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
 
@@ -202,16 +204,19 @@ include $(TEMPLATE_PATH)/Makefile.common
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 # Flash the program
-flash: $(OUTPUT_DIRECTORY)/nrf51422_xxac.hex
+flash: $(OUTPUT_DIRECTORY)/nrf51822_xxaa.hex
 	@echo Flashing: $<
-	nrfjprog --program $< -f nrf51 --sectorerase
-	nrfjprog --reset -f nrf51
+	@echo "Placeholder to call openocd"
+#	nrfjprog --program $< -f nrf51 --sectorerase
+#	nrfjprog --reset -f nrf51
 
 # Flash softdevice
 flash_softdevice:
 	@echo Flashing: s130_nrf51_2.0.1_softdevice.hex
-	nrfjprog --program $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex -f nrf51 --sectorerase 
-	nrfjprog --reset -f nrf51
+	@echo <Placeholder to call openocd>
+#	nrfjprog --program $(SDK_ROOT)/components/softdevice/s130/hex/s130_nrf51_2.0.1_softdevice.hex -f nrf51 --sectorerase 
+#	nrfjprog --reset -f nrf51
 
 erase:
-	nrfjprog --eraseall -f nrf52
+	@echo "Placeholder to call openocd"
+#	nrfjprog --eraseall -f nrf52
